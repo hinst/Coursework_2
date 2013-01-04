@@ -1,1 +1,3 @@
-﻿/CentralProject
+obj/
+bin/
+*.user
