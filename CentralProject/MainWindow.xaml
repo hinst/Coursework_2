@@ -1,8 +1,8 @@
 ﻿<Window x:Class="CentralProject.MainWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	Title="MainWindow" Height="321" Width="559"
-	x:Name="MainWindowInstance"
+	Title="MainWindow"
+	x:Name="CentralProjectMainWindow"
 >
 	
 </Window>

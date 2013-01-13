@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharp", "..\MyCSharp\MyC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyWPF", "..\MyCSharp\MyWPF\MyWPF.csproj", "{791BED65-A787-4F81-B53F-0CAAD45D5783}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTest", "..\MyCSharp\MyTest\MyTest.csproj", "{86B2C00E-11BF-422A-93CF-D011B13CA5B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,14 @@ Global
 		{791BED65-A787-4F81-B53F-0CAAD45D5783}.Release|x64.Build.0 = Release|x64
 		{791BED65-A787-4F81-B53F-0CAAD45D5783}.Release|x86.ActiveCfg = Release|x86
 		{791BED65-A787-4F81-B53F-0CAAD45D5783}.Release|x86.Build.0 = Release|x86
+		{86B2C00E-11BF-422A-93CF-D011B13CA5B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86B2C00E-11BF-422A-93CF-D011B13CA5B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86B2C00E-11BF-422A-93CF-D011B13CA5B0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{86B2C00E-11BF-422A-93CF-D011B13CA5B0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{86B2C00E-11BF-422A-93CF-D011B13CA5B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86B2C00E-11BF-422A-93CF-D011B13CA5B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86B2C00E-11BF-422A-93CF-D011B13CA5B0}.Release|x64.ActiveCfg = Release|Any CPU
+		{86B2C00E-11BF-422A-93CF-D011B13CA5B0}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
