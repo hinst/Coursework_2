@@ -8,7 +8,7 @@ using NLog;
 
 using MyCSharp;
 
-namespace CentralProject
+namespace Coursework_2
 {
 
 	class MainApplication

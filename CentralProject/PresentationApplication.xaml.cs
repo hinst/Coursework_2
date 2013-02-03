@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Input;
+using MyCSharp;
 
-namespace CentralProject
+namespace Coursework_2
 {
 
 	public partial class PresentationApplication : Application
@@ -11,6 +13,29 @@ namespace CentralProject
 			: base()
 		{
 			InitializeComponent();
+		}
+
+		new public static PresentationApplication Current
+		{
+			get
+			{
+				return (PresentationApplication) Application.Current;
+			}
+		}
+
+		protected PresentationApplicationCommands commands;
+
+		public PresentationApplicationCommands Commands
+		{
+			get
+			{
+				return AutoCreateField.Get(ref commands, () => new PresentationApplicationCommands());
+			}
+		}
+
+		public static void fffuuu()
+		{
+			var x = PresentationApplication.Current.Commands.AddShape;
 		}
 
 	}
