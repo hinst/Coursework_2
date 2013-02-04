@@ -2,8 +2,13 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Reflection;
+using System.Windows.Shapes;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 using NLog;
+
+using MyWPF;
 
 namespace Coursework_2
 {
@@ -44,12 +49,12 @@ namespace Coursework_2
 				if (AddShapeState)
 				{
 					Mouse.OverrideCursor = Cursors.Pen;
-					Mouse.AddPreviewMouseDownHandler(this, MousePenPreview);
+					Mouse.AddPreviewMouseDownHandler(this, MouseDownPenPreview);
 				}
 				else
 				{
 					Mouse.OverrideCursor = null;
-					Mouse.RemovePreviewMouseDownHandler(this, MousePenPreview);
+					Mouse.RemovePreviewMouseDownHandler(this, MouseDownPenPreview);
 				}
 			}
 		}
@@ -60,11 +65,25 @@ namespace Coursework_2
 			AddShapeState = true;
 		}
 
-		void MousePenPreview(object sender, MouseButtonEventArgs e)
+		protected void MouseDownPenPreview(object sender, MouseButtonEventArgs args)
 		{
 			log.Debug(MethodBase.GetCurrentMethod());
-			if (e.ChangedButton == MouseButton.Right)
+			if (args.ChangedButton == MouseButton.Right)
 				AddShapeState = false;
+		}
+
+		protected void CanvasMouseDown(object sender, MouseButtonEventArgs args)
+		{
+			if (args.ChangedButton == MouseButton.Left)
+				UserAddItem(args);
+		}
+
+		void UserAddItem(MouseButtonEventArgs args)
+		{
+			var nodeControl = new NodeControl();
+			Canvas.Children.Add(nodeControl);
+			Canvas.SetLeft(nodeControl, args.GetPosition(Canvas).X);
+			Canvas.SetTop(nodeControl, args.GetPosition(Canvas).Y);
 		}
 
 	}
