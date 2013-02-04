@@ -4,5 +4,6 @@
 	StartupUri="MainWindow.xaml"
 >
 	<Application.Resources>
+		<Image x:Key="Images_NodeShape" Source="Images/BulletShapeBlack16.png" />
 	</Application.Resources>
 </Application>

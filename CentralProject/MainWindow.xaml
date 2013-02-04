@@ -5,18 +5,27 @@
 	Title="MainWindow"
 	x:Name="CentralProjectMainWindow"
 >
+	<Window.Resources>
+		<Style x:Key="NodeBorderStyle" TargetType="Border">
+			<Setter Property="BorderThickness" Value="1.5" />
+			<Setter Property="BorderBrush" Value="DarkGray" />
+			<Setter Property="Padding" Value="3" />
+			<!--<Setter Property="CornerRadius" Value="3" />-->
+		</Style>
+		<Image x:Key="Images_NewItem" Source="Images/NewItemBlack16.png" />
+	</Window.Resources>
 	<DockPanel>
 		<Menu DockPanel.Dock="Top">
-			<MenuItem Header="File"></MenuItem>
-			<MenuItem Header="View"></MenuItem>
+			<MenuItem Header="File"> </MenuItem>
+			<MenuItem Header="View"> </MenuItem>
 			<MenuItem Header="Edit">
-				<MenuItem Header="Add Shape" x:Name="AddShapeMenuItem"></MenuItem>
-				<ToolBarPanel HorizontalAlignment="Left" Height="18" VerticalAlignment="Top" Width="58"/>
+				<MenuItem Header="Add Shape" x:Name="AddShapeMenuItem" Icon="{StaticResource Images_NewItem}">
+				</MenuItem>
 			</MenuItem>
 			<MenuItem Header="Help"></MenuItem>
 		</Menu>
 		<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-			<Canvas Width="1000" Height="1000" x:Name="Canvas">
+			<Canvas Width="1000" Height="1000" x:Name="Canvas" Background="WhiteSmoke">
 			</Canvas>
 		</ScrollViewer>
 	</DockPanel>

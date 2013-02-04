@@ -50,18 +50,19 @@ namespace Coursework_2
 				{
 					Mouse.OverrideCursor = Cursors.Pen;
 					Mouse.AddPreviewMouseDownHandler(this, MouseDownPenPreview);
+					Canvas.MouseDown += CanvasDropItemMouseDown;
 				}
 				else
 				{
 					Mouse.OverrideCursor = null;
 					Mouse.RemovePreviewMouseDownHandler(this, MouseDownPenPreview);
+					Canvas.MouseDown -= CanvasDropItemMouseDown;
 				}
 			}
 		}
 
 		protected void AddShape(object sender, ExecutedRoutedEventArgs args)
 		{
-			log.Debug("User commands: add shape");
 			AddShapeState = true;
 		}
 
@@ -72,18 +73,58 @@ namespace Coursework_2
 				AddShapeState = false;
 		}
 
-		protected void CanvasMouseDown(object sender, MouseButtonEventArgs args)
+		protected void CanvasDropItemMouseDown(object sender, MouseButtonEventArgs args)
 		{
 			if (args.ChangedButton == MouseButton.Left)
+			{
 				UserAddItem(args);
+				AddShapeState = false;
+			}
 		}
 
-		void UserAddItem(MouseButtonEventArgs args)
+		protected const bool TestAddShapeEnabled = false;
+
+		protected const bool UserAddItemAddsTestShape = false;
+
+		protected Style NodeControlStyle
 		{
+			get
+			{
+				return Resources["NodeBorderStyle"] as Style;
+			}
+		}
+
+		protected void UserAddItem(MouseButtonEventArgs args)
+		{
+			Point nodePosition =
+				new Point(
+					args.GetPosition(Canvas).X,
+					args.GetPosition(Canvas).Y
+				);
+			log.Debug("new node position is: " + nodePosition);
 			var nodeControl = new NodeControl();
+			nodeControl.Style = NodeControlStyle;
 			Canvas.Children.Add(nodeControl);
-			Canvas.SetLeft(nodeControl, args.GetPosition(Canvas).X);
-			Canvas.SetTop(nodeControl, args.GetPosition(Canvas).Y);
+			Canvas.SetLeft(nodeControl, nodePosition.X);
+			Canvas.SetTop(nodeControl, nodePosition.Y);
+		}
+
+		protected void TestAddShape()
+		{
+			log.Debug(MethodBase.GetCurrentMethod().Name + "...");
+			var rectangle = CreateTestingShape();
+			Canvas.Children.Add(rectangle);
+			Canvas.SetLeft(rectangle, 100);
+			Canvas.SetTop(rectangle, 100);
+		}
+
+		protected Shape CreateTestingShape()
+		{
+			var result = new Rectangle();
+			result.Width = 60;
+			result.Height = 60;
+			result.Fill = Brushes.Black;
+			return result;
 		}
 
 	}

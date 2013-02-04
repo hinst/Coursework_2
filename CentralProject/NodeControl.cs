@@ -2,6 +2,8 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 
+using NLog;
+
 using MyCSharp;
 
 namespace Coursework_2
@@ -14,7 +16,13 @@ namespace Coursework_2
 			: base()
 		{
 			InitializeTextBlock(text);
+			Child = CreateContent();
+			Initialize();
 		}
+
+		public const string DefaultText = "no caption";
+
+		protected Logger log = LogManager.GetCurrentClassLogger();
 
 		protected TextBlock textBlock;
 
@@ -22,7 +30,34 @@ namespace Coursework_2
 		{
 			textBlock = new TextBlock();
 			textBlock.Text = text;
-			AddLogicalChild(textBlock);
+		}
+
+		protected StackPanel CreateContent()
+		{
+			var result = new StackPanel();
+			result.Orientation = Orientation.Horizontal;
+			result.Children.Add(NodeShape);
+			result.Children.Add(textBlock);
+			return result;
+		}
+
+		protected Image nodeShape;
+
+		protected Image NodeShape
+		{
+			get
+			{
+				return 
+					AutoCreateField.Get(
+						ref nodeShape, 
+						() => 
+						{
+							var result = PresentationApplication.Current.Resources["Images_NodeShape"] as Image;
+							log.Debug(result);
+							return result;
+						}
+					);
+			}
 		}
 
 		protected Color DefaultBrushColor
@@ -35,10 +70,7 @@ namespace Coursework_2
 
 		protected void Initialize()
 		{
-			BorderBrush = new SolidColorBrush(DefaultBrushColor);
 		}
-
-		public const string DefaultText = "no caption";
 
 		public string Text
 		{
@@ -52,6 +84,7 @@ namespace Coursework_2
 					textBlock.Text = value;
 			}
 		}
+
 
 	}
 

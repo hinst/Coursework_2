@@ -33,11 +33,6 @@ namespace Coursework_2
 			}
 		}
 
-		public static void fffuuu()
-		{
-			var x = PresentationApplication.Current.Commands.AddShape;
-		}
-
 	}
 
 }
