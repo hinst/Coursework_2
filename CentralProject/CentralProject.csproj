@@ -67,6 +67,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -84,7 +85,11 @@
   <ItemGroup>
     <None Include="App.config" />
     <Resource Include="Images\NewItemBlack16.png" />
-    <Content Include="Images\BulletShapeBlack16.png" />
+    <Resource Include="Images\BulletShapeBlack16.png" />
+    <Resource Include="Images\SaveFileBlack16.png" />
+    <Resource Include="Images\DocumentBlack16.png" />
+    <Resource Include="Images\OpenFileBlack16.png" />
+    <Resource Include="Images\SaveAsFileBlack16.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Xml.Linq;
 
 using NLog;
 
@@ -18,6 +20,13 @@ namespace Coursework_2
 			InitializeTextBlock(text);
 			Child = CreateContent();
 			Initialize();
+		}
+
+		public static NodeControl Create(XElement element)
+		{
+			var result = new NodeControl();
+			result.LoadFromElement(element);
+			return result;
 		}
 
 		public const string DefaultText = "no caption";
@@ -38,6 +47,10 @@ namespace Coursework_2
 			result.Orientation = Orientation.Horizontal;
 			result.Children.Add(NodeShape);
 			result.Children.Add(textBlock);
+			ForEach.MatchingType<FrameworkElement>(
+				result.Children,
+				element => { element.Margin = new Thickness(3); }
+			);
 			return result;
 		}
 
@@ -52,11 +65,20 @@ namespace Coursework_2
 						ref nodeShape, 
 						() => 
 						{
-							var result = PresentationApplication.Current.Resources["Images_NodeShape"] as Image;
-							log.Debug(result);
+							var result = PresentationApplication.Current.Resources["Image_NodeShape"] as Image;
 							return result;
 						}
 					);
+			}
+		}
+
+		protected Thickness defaultContentMargin;
+
+		protected Thickness DefaultContentMargin
+		{
+			get
+			{
+				return AutoCreateField.Get(ref defaultContentMargin, () => new Thickness(1.5));
 			}
 		}
 
@@ -70,6 +92,7 @@ namespace Coursework_2
 
 		protected void Initialize()
 		{
+			Background = Brushes.Transparent;
 		}
 
 		public string Text
@@ -85,6 +108,30 @@ namespace Coursework_2
 			}
 		}
 
+		protected const string TextAttributeName = "Text";
+		protected const string LeftAttributeName = "Left";
+		protected const string TopAttributeName = "Top";
+
+		public XElement SaveToElement()
+		{
+			var result = new XElement(GetType().Name);
+			SaveToElement(result);
+			return result;
+		}
+
+		public void SaveToElement(XElement element)
+		{
+			element.SetAttributeValue(TextAttributeName, Text);
+			element.SetAttributeValue(LeftAttributeName, Canvas.GetLeft(this));
+			element.SetAttributeValue(TopAttributeName, Canvas.GetTop(this));
+		}
+
+		public void LoadFromElement(XElement element)
+		{
+			Text = element.Attribute(TextAttributeName).Value;
+			Canvas.SetLeft(this, int.Parse(element.Attribute(LeftAttributeName).Value));
+			Canvas.SetTop(this, int.Parse(element.Attribute(TopAttributeName).Value));
+		}
 
 	}
 

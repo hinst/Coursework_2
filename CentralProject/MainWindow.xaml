@@ -9,23 +9,32 @@
 		<Style x:Key="NodeBorderStyle" TargetType="Border">
 			<Setter Property="BorderThickness" Value="1.5" />
 			<Setter Property="BorderBrush" Value="DarkGray" />
-			<Setter Property="Padding" Value="3" />
-			<!--<Setter Property="CornerRadius" Value="3" />-->
 		</Style>
-		<Image x:Key="Images_NewItem" Source="Images/NewItemBlack16.png" />
+		<Image x:Key="Image_NewItem" Source="Images/NewItemBlack16.png" />
+		<Image x:Key="Image_OpenFile" Source="Images/OpenFileBlack16.png" />
+		<Image x:Key="Image_SaveFile" Source="Images/SaveFileBlack16.png" />
+		<Image x:Key="Image_SaveAsFile" Source="Images/SaveAsFileBlack16.png" />
+		<Image x:Key="Image_File" Source="Images/DocumentBlack16.png" Width="16px" Height="16px" SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="HighQuality" />
 	</Window.Resources>
 	<DockPanel>
-		<Menu DockPanel.Dock="Top">
-			<MenuItem Header="File"> </MenuItem>
+		<Menu DockPanel.Dock="Top" UseLayoutRounding="True">
+			<MenuItem Header="File" Icon="{StaticResource Image_File}">
+				<MenuItem Header="Open file..." x:Name="OpenFileMenuItem" Icon="{StaticResource Image_OpenFile}" />
+				<MenuItem Header="Save file" x:Name="SaveFileMenuItem" Icon="{StaticResource Image_SaveFile}" />
+				<MenuItem Header="Save as file..." x:Name="SaveAsFileMenuItem" Icon="{StaticResource Image_SaveAsFile}" />
+			</MenuItem>
 			<MenuItem Header="View"> </MenuItem>
 			<MenuItem Header="Edit">
-				<MenuItem Header="Add Shape" x:Name="AddShapeMenuItem" Icon="{StaticResource Images_NewItem}">
+				<MenuItem Header="Add Item" x:Name="AddItemMenuItem" Icon="{StaticResource Image_NewItem}">
 				</MenuItem>
 			</MenuItem>
 			<MenuItem Header="Help"></MenuItem>
 		</Menu>
 		<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
 			<Canvas Width="1000" Height="1000" x:Name="Canvas" Background="WhiteSmoke">
+				<Canvas.Resources>
+					<Style TargetType="{x:Type h:NodeControl}" BasedOn="{StaticResource NodeBorderStyle}"></Style>
+				</Canvas.Resources>
 			</Canvas>
 		</ScrollViewer>
 	</DockPanel>

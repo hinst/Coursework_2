@@ -17,7 +17,33 @@ namespace Coursework_2
 			{
 				return AutoCreateField.Get(
 						ref addShape,
-						() => new RoutedUICommand("Add shape", "AddShape", this.GetType())
+						() => new RoutedUICommand("Add shape", "AddShape", GetType())
+					);
+			}
+		}
+
+		protected RoutedUICommand openFile;
+
+		public RoutedUICommand OpenFile
+		{
+			get
+			{
+				return AutoCreateField.Get(
+					ref openFile, 
+					() => new RoutedUICommand("Open file", "OpenFile", GetType())
+				);
+			}
+		}
+
+		protected RoutedUICommand saveFile;
+
+		public RoutedUICommand SaveFile
+		{
+			get
+			{
+				return AutoCreateField.Get(
+						ref saveFile,
+						() => new RoutedUICommand("Save file", "SaveFile", GetType())
 					);
 			}
 		}
