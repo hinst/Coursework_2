@@ -45,6 +45,7 @@ namespace Coursework_2
 			BindCommand(SaveFileMenuItem, Commands.SaveFile, UserSaveFile);
 			BindCommand(SaveAsFileMenuItem, Commands.SaveAsFile, UserSaveAsFile);
 			BindCommand(AddItemMenuItem, Commands.AddShape, UserAddItem);
+			BindCommand(AddLinkMenuItem, Commands.DrawLink, UserAddLink);
 		}
 
 		protected void BindCommand(MenuItem item, RoutedUICommand command, ExecutedRoutedEventHandler handler)
@@ -101,6 +102,11 @@ namespace Coursework_2
 				UserAddItem(args);
 				AddShapeState = false;
 			}
+		}
+
+		protected void UserAddLink(object sender, ExecutedRoutedEventArgs args)
+		{
+			log.Debug("[user_command incoming] UserAddLink");
 		}
 
 		protected const bool TestAddShapeEnabled = false;
