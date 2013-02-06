@@ -48,6 +48,32 @@ namespace Coursework_2
 			}
 		}
 
+		protected RoutedUICommand saveAsFile;
+
+		public RoutedUICommand SaveAsFile
+		{
+			get
+			{
+				return AutoCreateField.Get(
+						ref saveAsFile,
+						() => new RoutedUICommand("Save as file...", "SaveAsFile", GetType())
+					);
+			}
+		}
+
+		protected RoutedUICommand drawLink;
+
+		public RoutedUICommand DrawLink
+		{
+			get
+			{ 
+				return AutoCreateField.Get(
+						ref drawLink,
+						() => new RoutedUICommand("Draw link...", "DrawLink", GetType())
+					);
+			}
+		}
+
 		protected static PresentationApplicationCommands commands;
 
 		public static PresentationApplicationCommands Commands

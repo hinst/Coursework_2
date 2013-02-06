@@ -71,6 +71,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CanvasNodeLink.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -90,6 +91,7 @@
     <Resource Include="Images\DocumentBlack16.png" />
     <Resource Include="Images\OpenFileBlack16.png" />
     <Resource Include="Images\SaveAsFileBlack16.png" />
+    <Resource Include="Images\LinkBlack16.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

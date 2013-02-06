@@ -43,6 +43,7 @@ namespace Coursework_2
 		{
 			BindCommand(OpenFileMenuItem, Commands.OpenFile, UserOpenFile);
 			BindCommand(SaveFileMenuItem, Commands.SaveFile, UserSaveFile);
+			BindCommand(SaveAsFileMenuItem, Commands.SaveAsFile, UserSaveAsFile);
 			BindCommand(AddItemMenuItem, Commands.AddShape, UserAddItem);
 		}
 
@@ -171,10 +172,12 @@ namespace Coursework_2
 		{
 			log.Debug("[user_command incoming]  Save file...");
 			if (DocumentFileName == null)
-				UserSaveFileAs(sender, args);
+				UserSaveAsFile(sender, args);
+			else
+				UserSaveFile(DocumentFileName);
 		}
 
-		protected void UserSaveFileAs(object sender, ExecutedRoutedEventArgs args)
+		protected void UserSaveAsFile(object sender, ExecutedRoutedEventArgs args)
 		{
 			var saveFileDialog = new Microsoft.Win32.SaveFileDialog();
 			saveFileDialog.DefaultExt = ContentFileExtension;
@@ -230,6 +233,11 @@ namespace Coursework_2
 
 		public const string XmlContentElementName = "content";
 
+		protected void ClearContent()
+		{
+			Canvas.Children.Clear();
+		}
+
 		#region Load content
 
 		protected void UserOpenFile(object sender, ExecutedRoutedEventArgs args)
@@ -241,11 +249,16 @@ namespace Coursework_2
 			if (result == true)
 			{
 				var fileName = openFileDialog.FileName;
-				if (File.Exists(fileName))
-					UserOpenFile(fileName);
-				else
-					MessageBox.Show(this, fileName, "File does not exist", MessageBoxButton.OK, MessageBoxImage.Error);
+				UserOpenFileSafe(fileName);
 			}
+		}
+
+		protected void UserOpenFileSafe(string fileName)
+		{
+			if (File.Exists(fileName))
+				UserOpenFile(fileName);
+			else
+				MessageBox.Show(this, fileName, "File does not exist", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 
 		protected void UserOpenFile(string fileName)
@@ -256,6 +269,7 @@ namespace Coursework_2
 
 		protected void LoadContentFrom(XDocument document)
 		{
+			ClearContent();
 			var contentElement = document.Element(XmlContentElementName);
 			Assert.Assigned(contentElement);
 			LoadNodes(contentElement);
@@ -267,14 +281,15 @@ namespace Coursework_2
 			{
 				var currentElement = node as XElement;
 				if (currentElement != null)
-				{
 					if (currentElement.Name == typeof(NodeControl).Name)
-					{
-						var visualNode = NodeControl.Create(currentElement);
-						Canvas.Children.Add(visualNode);
-					}
-				}
+						LoadNodeControl(currentElement);
 			}
+		}
+
+		protected void LoadNodeControl(XElement nodeElement)
+		{
+			var visualNode = NodeControl.Create(nodeElement);
+			Canvas.Children.Add(visualNode);
 		}
 
 		#endregion

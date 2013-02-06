@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml.Linq;
@@ -7,6 +8,8 @@ using System.Xml.Linq;
 using NLog;
 
 using MyCSharp;
+
+using MyWPF;
 
 namespace Coursework_2
 {
@@ -17,9 +20,21 @@ namespace Coursework_2
 		public NodeControl(string text = DefaultText)
 			: base()
 		{
-			InitializeTextBlock(text);
-			Child = CreateContent();
 			Initialize();
+			InitializeContent(text);
+		}
+
+		protected void Initialize()
+		{
+			Background = Brushes.Transparent;
+			MouseDown += MouseDownHandler;
+			MouseMove += MouseMoveHandler;
+		}
+
+		protected void InitializeContent(string text)
+		{
+			panel = CreatePanel(text);
+			Child = panel;
 		}
 
 		public static NodeControl Create(XElement element)
@@ -33,7 +48,14 @@ namespace Coursework_2
 
 		protected Logger log = LogManager.GetCurrentClassLogger();
 
+		protected StackPanel panel;
 		protected TextBlock textBlock;
+		protected Image nodeShape;
+
+		protected void InitializeNodeShape()
+		{
+			nodeShape = CreateNodeShape();
+		}
 
 		protected void InitializeTextBlock(string text)
 		{
@@ -41,35 +63,105 @@ namespace Coursework_2
 			textBlock.Text = text;
 		}
 
-		protected StackPanel CreateContent()
+		protected StackPanel CreatePanel(string text)
 		{
 			var result = new StackPanel();
 			result.Orientation = Orientation.Horizontal;
-			result.Children.Add(NodeShape);
+			InitializeNodeShape();
+			result.Children.Add(nodeShape);
+			InitializeTextBlock(text);
 			result.Children.Add(textBlock);
 			ForEach.MatchingType<FrameworkElement>(
 				result.Children,
-				element => { element.Margin = new Thickness(3); }
+				element => element.Margin = new Thickness(3)
 			);
+			result.ContextMenu = CreateContextMenu();
 			return result;
 		}
 
-		protected Image nodeShape;
+		protected ContextMenu CreateContextMenu()
+		{
+			var menu = new ContextMenu();
+			menu.Items.Add(CreateRemoveMenuItem());
+			return menu;
+		}
 
-		protected Image NodeShape
+		protected MenuItem CreateRemoveMenuItem()
+		{
+			var item = new MenuItem();
+			item.Header = "Remove item";
+			item.Click += 
+				delegate(object sender, RoutedEventArgs agrs) 
+				{
+					RemoveMe(this);
+				};
+			return item;
+		}
+
+		protected void RemoveMe(NodeControl me)
+		{
+			ParentCanvas.Children.Remove(me);
+		}
+
+		protected Image CreateNodeShape()
+		{
+			var result = PresentationApplication.Current.Resources["Image_NodeShape"] as Image;
+			result.Cursor = Cursors.SizeAll;
+			return result;
+		}
+
+		protected Point PanelMouseRelativePosition;
+
+		public Canvas ParentCanvas
 		{
 			get
 			{
-				return 
-					AutoCreateField.Get(
-						ref nodeShape, 
-						() => 
-						{
-							var result = PresentationApplication.Current.Resources["Image_NodeShape"] as Image;
-							return result;
-						}
-					);
+				return this.LogicalNavigateUp<Canvas>();
 			}
+		}
+
+		protected void MouseDownHandler(object sender, MouseEventArgs args)
+		{
+			PanelMouseRelativePosition = args.GetPosition(this);
+		}
+
+		protected static bool draggingMoving;
+
+		protected bool DraggingMoving
+		{
+			set
+			{
+				if (draggingMoving != value)
+				{
+					draggingMoving = value;
+					if (draggingMoving)
+						ParentCanvas.MouseMove += DragMove;
+					else
+						ParentCanvas.MouseMove -= DragMove;
+				}
+			}
+			get
+			{
+				return draggingMoving;
+			}
+		}
+
+		protected void MouseMoveHandler(object sender, MouseEventArgs args)
+		{
+			if (args.LeftButton == MouseButtonState.Pressed && Mouse.DirectlyOver == nodeShape && false == DraggingMoving)
+				DraggingMoving = true;
+		}
+
+		protected void DragMove(object sender, MouseEventArgs args)
+		{
+			DraggingMoving = args.LeftButton == MouseButtonState.Pressed;
+			if (DraggingMoving)
+			{
+				Canvas.SetLeft(this, args.GetPosition(ParentCanvas).X - PanelMouseRelativePosition.X);
+				Canvas.SetTop(this, args.GetPosition(ParentCanvas).Y - PanelMouseRelativePosition.Y);
+			}
+			else
+				DraggingMoving = false;
 		}
 
 		protected Thickness defaultContentMargin;
@@ -88,11 +180,6 @@ namespace Coursework_2
 			{
 				return Colors.Black;
 			}
-		}
-
-		protected void Initialize()
-		{
-			Background = Brushes.Transparent;
 		}
 
 		public string Text
@@ -129,8 +216,8 @@ namespace Coursework_2
 		public void LoadFromElement(XElement element)
 		{
 			Text = element.Attribute(TextAttributeName).Value;
-			Canvas.SetLeft(this, int.Parse(element.Attribute(LeftAttributeName).Value));
-			Canvas.SetTop(this, int.Parse(element.Attribute(TopAttributeName).Value));
+			Canvas.SetLeft(this, double.Parse(element.Attribute(LeftAttributeName).Value));
+			Canvas.SetTop(this, double.Parse(element.Attribute(TopAttributeName).Value));
 		}
 
 	}
