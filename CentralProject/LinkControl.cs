@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 
 using NLog;
 
+using MyCSharp;
+
 namespace Coursework_2
 {
 
-	internal class CanvasNodeLink : FrameworkElement
+	internal class LinkControl : FrameworkElement
 	{
 
 		protected Logger log = LogManager.GetCurrentClassLogger();
 
-		protected CanvasNodeLink Create(Tuple<NodeControl, NodeControl> linkedNodes)
+		public LinkControl Create(Tuple<NodeControl, NodeControl> linkedNodes)
 		{
-			var result = new CanvasNodeLink();
+			var result = new LinkControl();
 			result.linkedNodes = linkedNodes;
 			return result;
 		}
@@ -36,8 +39,16 @@ namespace Coursework_2
 		{
 			get
 			{
-				return linkLine;
+				return AutoCreateField.Get( ref linkLine, () => new Line() );
 			}
+		}
+
+		public void BindFirstPoint(NodeControl control)
+		{
+			var binding = new Binding();
+			binding.Source = control;
+			binding.Path = new PropertyPath("NodeShape.Left");
+			LinkLine.SetBinding(Line.X1Property, binding);
 		}
 
 	}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.ComponentModel;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -29,6 +30,16 @@ namespace Coursework_2
 			Background = Brushes.Transparent;
 			MouseDown += MouseDownHandler;
 			MouseMove += MouseMoveHandler;
+			InitializePositionPropertiesChangedNotification();
+		}
+
+		protected void InitializePositionPropertiesChangedNotification()
+		{
+			var leftDescriptor = DependencyPropertyDescriptor.FromProperty(Canvas.LeftProperty, this.GetType());
+			leftDescriptor.AddValueChanged(this, LeftPropertyChangedHandler);
+
+			var topDescriptor = DependencyPropertyDescriptor.FromProperty(Canvas.TopProperty, this.GetType());
+			topDescriptor.AddValueChanged(this, TopPropertyChangedHandler);
 		}
 
 		protected void InitializeContent(string text)
@@ -49,28 +60,73 @@ namespace Coursework_2
 		protected Logger log = LogManager.GetCurrentClassLogger();
 
 		protected StackPanel panel;
-		protected TextBlock textBlock;
-		protected Image nodeShape;
 
-		protected void InitializeNodeShape()
+		public StackPanel Panel
 		{
-			nodeShape = CreateNodeShape();
+			get
+			{
+				return panel;
+			}
+		}
+
+		protected TextBlock caption;
+
+		public TextBlock Caption
+		{
+			get
+			{
+				return caption;
+			}
+		}
+
+		protected Image thing;
+
+		public Image Thing
+		{
+			get
+			{
+				return thing;
+			}
+		}
+
+		public static readonly DependencyProperty LinkPointXProperty = DependencyProperty.Register("LinkPointX", typeof(double), typeof(NodeControl));
+
+		public static readonly DependencyProperty LinkPointYProperty = DependencyProperty.Register("LinkPointY", typeof(double), typeof(NodeControl));
+
+		protected void InitializeThing()
+		{
+			thing = CreateThing();
+			Thing.Cursor = Cursors.SizeAll;
+		}
+
+		protected void LeftPropertyChangedHandler(object sender, EventArgs e)
+		{
+			var left = Canvas.GetLeft(this);
+			log.Debug("L: " + left);
+			SetValue(LinkPointXProperty, left + Thing.Width / 2);
+		}
+
+		protected void TopPropertyChangedHandler(object sender, EventArgs e)
+		{
+			var top = Canvas.GetTop(this);
+			log.Debug("T: " + top);
+			SetValue(LinkPointYProperty, top + Thing.Height / 2);
 		}
 
 		protected void InitializeTextBlock(string text)
 		{
-			textBlock = new TextBlock();
-			textBlock.Text = text;
+			caption = new TextBlock();
+			caption.Text = text;
 		}
 
 		protected StackPanel CreatePanel(string text)
 		{
 			var result = new StackPanel();
 			result.Orientation = Orientation.Horizontal;
-			InitializeNodeShape();
-			result.Children.Add(nodeShape);
+			InitializeThing();
+			result.Children.Add(thing);
 			InitializeTextBlock(text);
-			result.Children.Add(textBlock);
+			result.Children.Add(caption);
 			ForEach.MatchingType<FrameworkElement>(
 				result.Children,
 				element => element.Margin = new Thickness(3)
@@ -103,10 +159,9 @@ namespace Coursework_2
 			ParentCanvas.Children.Remove(me);
 		}
 
-		protected Image CreateNodeShape()
+		protected Image CreateThing()
 		{
 			var result = PresentationApplication.Current.Resources["Image_NodeShape"] as Image;
-			result.Cursor = Cursors.SizeAll;
 			return result;
 		}
 
@@ -148,7 +203,7 @@ namespace Coursework_2
 
 		protected void MouseMoveHandler(object sender, MouseEventArgs args)
 		{
-			if (args.LeftButton == MouseButtonState.Pressed && Mouse.DirectlyOver == nodeShape && false == DraggingMoving)
+			if (args.LeftButton == MouseButtonState.Pressed && Mouse.DirectlyOver == thing && false == DraggingMoving)
 				DraggingMoving = true;
 		}
 
@@ -186,12 +241,12 @@ namespace Coursework_2
 		{
 			get
 			{
-				return textBlock != null ? textBlock.Text : null;
+				return caption != null ? caption.Text : null;
 			}
 			set
 			{
-				if (textBlock != null)
-					textBlock.Text = value;
+				if (caption != null)
+					caption.Text = value;
 			}
 		}
 

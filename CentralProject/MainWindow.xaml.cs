@@ -57,61 +57,15 @@ namespace Coursework_2
 			item.Command = command;
 		}
 
-		protected bool addShapeState;
-
-		public bool AddShapeState
-		{
-			get
-			{
-				return addShapeState;
-			}
-			set
-			{
-				addShapeState = value;
-				if (AddShapeState)
-				{
-					Canvas.Cursor = Cursors.Pen;
-					Mouse.AddPreviewMouseDownHandler(this, MouseDownPenPreview);
-					Canvas.MouseDown += CanvasDropItemMouseDown;
-				}
-				else
-				{
-					Canvas.Cursor = null;
-					Mouse.RemovePreviewMouseDownHandler(this, MouseDownPenPreview);
-					Canvas.MouseDown -= CanvasDropItemMouseDown;
-				}
-			}
-		}
-
 		protected void UserAddItem(object sender, ExecutedRoutedEventArgs args)
 		{
-			AddShapeState = true;
-		}
-
-		protected void MouseDownPenPreview(object sender, MouseButtonEventArgs args)
-		{
-			log.Debug(MethodBase.GetCurrentMethod());
-			if (args.ChangedButton == MouseButton.Right)
-				AddShapeState = false;
-		}
-
-		protected void CanvasDropItemMouseDown(object sender, MouseButtonEventArgs args)
-		{
-			if (args.ChangedButton == MouseButton.Left)
-			{
-				UserAddItem(args);
-				AddShapeState = false;
-			}
+			new MouseDrop<Canvas>().Create(Cursors.Pen, UserAddItem).Drop(Canvas);
 		}
 
 		protected void UserAddLink(object sender, ExecutedRoutedEventArgs args)
 		{
-			log.Debug("[user_command incoming] UserAddLink");
+			new MouseDrop<NodeControl>().Create(Cursors.Pen, UserAddLink).Drop(Canvas);
 		}
-
-		protected const bool TestAddShapeEnabled = false;
-
-		protected const bool UserAddItemAddsTestShape = false;
 
 		protected Style NodeControlStyle
 		{
@@ -121,23 +75,18 @@ namespace Coursework_2
 			}
 		}
 
-		protected const bool LogDebugUserAddItemNewNodePosition = false;
-
-		protected void UserAddItem(MouseButtonEventArgs args)
+		protected void UserAddItem(Point nodePosition, Canvas canvas)
 		{
-			Point nodePosition =
-				new Point(
-					args.GetPosition(Canvas).X,
-					args.GetPosition(Canvas).Y
-				);
-			if (LogDebugUserAddItemNewNodePosition)
-				#pragma warning disable 162
-				log.Debug("new node position is: " + nodePosition);
-				#pragma warning restore 162
 			var nodeControl = new NodeControl();
-			Canvas.Children.Add(nodeControl);
+			canvas.Children.Add(nodeControl);
+			log.Debug(nodePosition);
 			Canvas.SetLeft(nodeControl, nodePosition.X);
 			Canvas.SetTop(nodeControl, nodePosition.Y);
+		}
+
+		protected void UserAddLink(Point linkPosition, NodeControl control)
+		{
+			Line line = new Line();
 		}
 
 		protected void TestAddShape()
