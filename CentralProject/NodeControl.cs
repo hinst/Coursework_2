@@ -116,7 +116,7 @@ namespace Coursework_2
 		{
 			get
 			{
-				return this.LogicalNavigateUp<Canvas>();
+				return this.NavigateUp<Canvas>();
 			}
 		}
 
