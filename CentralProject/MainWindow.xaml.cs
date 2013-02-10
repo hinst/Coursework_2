@@ -79,19 +79,21 @@ namespace Coursework_2
 		{
 			var nodeControl = new NodeControl();
 			canvas.Children.Add(nodeControl);
-			log.Debug(nodePosition);
+			UpdateLayout();
 			Canvas.SetLeft(nodeControl, nodePosition.X);
 			Canvas.SetTop(nodeControl, nodePosition.Y);
 		}
 
 		protected void UserAddLink(Point linkPosition, NodeControl control)
 		{
-			Line line = new Line();
+			log.Debug("Now adding user link, first link point is: " + control.LinkPoint);
+			var linkControl = new LinkControl().Create(new Tuple<NodeControl, NodeControl>(control, null));
+			linkControl.BindPoint2MouseMove(Canvas);
+			Canvas.Children.Add(linkControl.TheLine);
 		}
 
 		protected void TestAddShape()
 		{
-			log.Debug(MethodBase.GetCurrentMethod().Name + "...");
 			var rectangle = CreateTestingShape();
 			Canvas.Children.Add(rectangle);
 			Canvas.SetLeft(rectangle, 100);
@@ -125,7 +127,6 @@ namespace Coursework_2
 
 		protected void UserSaveFile(object sender, ExecutedRoutedEventArgs args)
 		{
-			log.Debug("[user_command incoming]  Save file...");
 			if (DocumentFileName == null)
 				UserSaveAsFile(sender, args);
 			else

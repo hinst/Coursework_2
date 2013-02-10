@@ -9,7 +9,6 @@ using System.Xml.Linq;
 using NLog;
 
 using MyCSharp;
-
 using MyWPF;
 
 namespace Coursework_2
@@ -33,13 +32,75 @@ namespace Coursework_2
 			InitializePositionPropertiesChangedNotification();
 		}
 
+		public static readonly DependencyProperty LinkPointXProperty = DependencyProperty.Register("LinkPointX", typeof(double), typeof(NodeControl));
+
+		public static readonly DependencyProperty LinkPointYProperty = DependencyProperty.Register("LinkPointY", typeof(double), typeof(NodeControl));
+
+		public double LinkPointX
+		{
+			get
+			{
+				return (double) this.GetValue(LinkPointXProperty);
+			}
+		}
+
+		public double LinkPointY
+		{
+			get
+			{
+				return (double) this.GetValue(LinkPointYProperty);
+			}
+		}
+
+		public Point LinkPoint
+		{
+			get
+			{
+				return new Point(LinkPointX, LinkPointY);
+			}
+		}
+
 		protected void InitializePositionPropertiesChangedNotification()
 		{
-			var leftDescriptor = DependencyPropertyDescriptor.FromProperty(Canvas.LeftProperty, this.GetType());
-			leftDescriptor.AddValueChanged(this, LeftPropertyChangedHandler);
+			var left = new PropertyChangeNotifier(this, Canvas.LeftProperty);
+			left.ValueChanged += LeftPropertyChangedHandler;
 
-			var topDescriptor = DependencyPropertyDescriptor.FromProperty(Canvas.TopProperty, this.GetType());
-			topDescriptor.AddValueChanged(this, TopPropertyChangedHandler);
+			var top = new PropertyChangeNotifier(this, Canvas.TopProperty);
+			top.ValueChanged += TopPropertyChangedHandler;
+		}
+
+		protected Point RelativeThingCenter
+		{
+			get
+			{
+				return new Point(Thing.ActualWidth / 2, Thing.ActualHeight / 2);
+			}
+		}
+
+		protected bool LogDebugLinkPointPropertyChangedHandler { get { return true; } }
+
+		protected void LeftPropertyChangedHandler(object sender, EventArgs e)
+		{
+			var notifier = (PropertyChangeNotifier)sender;
+			var left = (double)notifier.Value;
+			double linkPointX = -1;
+			for (int i = 0; i < 3; ++i)
+				linkPointX = Thing.TranslatePoint(RelativeThingCenter, ParentCanvas).X;
+			SetValue(LinkPointXProperty, linkPointX);
+			if (LogDebugLinkPointPropertyChangedHandler)
+				log.Debug("LinPointXProperty assigned to: " + linkPointX + "; left is: " + left + "; rtc is: " + RelativeThingCenter);
+		}
+
+		protected void TopPropertyChangedHandler(object sender, EventArgs e)
+		{
+			var notifier = (PropertyChangeNotifier)sender;
+			var top = (double)notifier.Value;
+			double linkPointY = -1;
+			for (int i = 0; i < 3; ++i)
+				linkPointY = Thing.TranslatePoint(RelativeThingCenter, ParentCanvas).Y;
+			SetValue(LinkPointYProperty, linkPointY);
+			if (LogDebugLinkPointPropertyChangedHandler)
+				log.Debug("LinPointYProperty assigned to: " + linkPointY + "; top is: " + top + "; rtc is: " + RelativeThingCenter);
 		}
 
 		protected void InitializeContent(string text)
@@ -89,31 +150,13 @@ namespace Coursework_2
 			}
 		}
 
-		public static readonly DependencyProperty LinkPointXProperty = DependencyProperty.Register("LinkPointX", typeof(double), typeof(NodeControl));
-
-		public static readonly DependencyProperty LinkPointYProperty = DependencyProperty.Register("LinkPointY", typeof(double), typeof(NodeControl));
-
 		protected void InitializeThing()
 		{
 			thing = CreateThing();
 			Thing.Cursor = Cursors.SizeAll;
 		}
 
-		protected void LeftPropertyChangedHandler(object sender, EventArgs e)
-		{
-			var left = Canvas.GetLeft(this);
-			log.Debug("L: " + left);
-			SetValue(LinkPointXProperty, left + Thing.Width / 2);
-		}
-
-		protected void TopPropertyChangedHandler(object sender, EventArgs e)
-		{
-			var top = Canvas.GetTop(this);
-			log.Debug("T: " + top);
-			SetValue(LinkPointYProperty, top + Thing.Height / 2);
-		}
-
-		protected void InitializeTextBlock(string text)
+		protected void InitializeCaption(string text)
 		{
 			caption = new TextBlock();
 			caption.Text = text;
@@ -125,7 +168,7 @@ namespace Coursework_2
 			result.Orientation = Orientation.Horizontal;
 			InitializeThing();
 			result.Children.Add(thing);
-			InitializeTextBlock(text);
+			InitializeCaption(text);
 			result.Children.Add(caption);
 			ForEach.MatchingType<FrameworkElement>(
 				result.Children,
