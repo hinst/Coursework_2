@@ -73,13 +73,6 @@ namespace Coursework_2
 
 		protected void InitializePositionPropertiesChangedNotification()
 		{
-			/*
-			var leftDescriptor = DependencyPropertyDescriptor.FromProperty(Canvas.LeftProperty, this.GetType());
-			leftDescriptor.AddValueChanged(this, LeftPropertyChangedHandler);
-
-			var topDescriptor = DependencyPropertyDescriptor.FromProperty(Canvas.TopProperty, this.GetType());
-			topDescriptor.AddValueChanged(this, TopPropertyChangedHandler);
-			*/
 			var left = new PropertyChangeNotifier(this, Canvas.LeftProperty);
 			left.ValueChanged += LeftPropertyChangedHandler;
 			PropertyChangeNotifiers.Add(left);
@@ -97,7 +90,7 @@ namespace Coursework_2
 			}
 		}
 
-		protected bool LogDebugLinkPointPropertyChangedHandler { get { return true; } }
+		protected bool LogDebugLinkPointPropertyChangedHandler { get { return false; } }
 
 		protected void LeftPropertyChangedHandler(object sender, EventArgs e)
 		{
@@ -176,9 +169,29 @@ namespace Coursework_2
 			Thing.Cursor = Cursors.SizeAll;
 		}
 
+		protected static Brush defaultCaptionBackgroundBrush;
+
+		protected static Brush DefaultCaptionBackgroundBrush
+		{
+			get
+			{
+				return
+					AutoCreateField.Get(
+						ref defaultCaptionBackgroundBrush,
+						() =>
+						{
+							var color = Colors.White;
+							color.A = byte.MaxValue / 3 * 2;
+							return new SolidColorBrush(color);
+						}
+					);
+			}
+		}
+
 		protected void InitializeCaption(string text)
 		{
 			caption = new TextBlock();
+			caption.Background = DefaultCaptionBackgroundBrush;
 			caption.Text = text;
 		}
 
@@ -202,6 +215,7 @@ namespace Coursework_2
 		{
 			var menu = new ContextMenu();
 			menu.Items.Add(CreateRemoveMenuItem());
+			MenuItem item = new MenuItem();
 			return menu;
 		}
 
@@ -209,8 +223,8 @@ namespace Coursework_2
 		{
 			var item = new MenuItem();
 			item.Header = "Remove item";
-			item.Click += 
-				delegate(object sender, RoutedEventArgs agrs) 
+			item.Click +=
+				delegate(object sender, RoutedEventArgs agrs)
 				{
 					RemoveMe(this);
 				};
@@ -220,6 +234,18 @@ namespace Coursework_2
 		protected void RemoveMe(NodeControl me)
 		{
 			ParentCanvas.Children.Remove(me);
+		}
+
+		protected MenuItem CreateRemoveLinkMenuItem(LinkControl link)
+		{
+			var opposite = link.LinkedNodes.Item1 == this ? link.LinkedNodes.Item1 : link.LinkedNodes.Item2;
+			var item = new RemoveLinkMenuItem().Create(link, opposite);
+			return item;
+		}
+
+		protected void AddRemoveLinkContextMenuItem(LinkControl link)
+		{
+			ContextMenu.Items.Add(CreateRemoveLinkMenuItem(link));
 		}
 
 		protected Image CreateThing()
@@ -300,19 +326,6 @@ namespace Coursework_2
 			}
 		}
 
-		public string Text
-		{
-			get
-			{
-				return caption != null ? caption.Text : null;
-			}
-			set
-			{
-				if (caption != null)
-					caption.Text = value;
-			}
-		}
-
 		protected const string TextAttributeName = "Text";
 		protected const string LeftAttributeName = "Left";
 		protected const string TopAttributeName = "Top";
@@ -326,14 +339,14 @@ namespace Coursework_2
 
 		public void SaveToElement(XElement element)
 		{
-			element.SetAttributeValue(TextAttributeName, Text);
+			element.SetAttributeValue(TextAttributeName, Caption.Text);
 			element.SetAttributeValue(LeftAttributeName, Canvas.GetLeft(this));
 			element.SetAttributeValue(TopAttributeName, Canvas.GetTop(this));
 		}
 
 		public void LoadFromElement(XElement element)
 		{
-			Text = element.Attribute(TextAttributeName).Value;
+			Caption.Text = element.Attribute(TextAttributeName).Value;
 			Canvas.SetLeft(this, double.Parse(element.Attribute(LeftAttributeName).Value));
 			Canvas.SetTop(this, double.Parse(element.Attribute(TopAttributeName).Value));
 		}
