@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml.Linq;
+using System.Collections.Generic;
 
 using NLog;
 
@@ -60,13 +61,32 @@ namespace Coursework_2
 			}
 		}
 
+		protected List<PropertyChangeNotifier> propertyChangeNotifiers;
+
+		protected List<PropertyChangeNotifier> PropertyChangeNotifiers
+		{
+			get
+			{
+				return AutoCreateField.Get(ref propertyChangeNotifiers, () => new List<PropertyChangeNotifier>());
+			}
+		}
+
 		protected void InitializePositionPropertiesChangedNotification()
 		{
+			/*
+			var leftDescriptor = DependencyPropertyDescriptor.FromProperty(Canvas.LeftProperty, this.GetType());
+			leftDescriptor.AddValueChanged(this, LeftPropertyChangedHandler);
+
+			var topDescriptor = DependencyPropertyDescriptor.FromProperty(Canvas.TopProperty, this.GetType());
+			topDescriptor.AddValueChanged(this, TopPropertyChangedHandler);
+			*/
 			var left = new PropertyChangeNotifier(this, Canvas.LeftProperty);
 			left.ValueChanged += LeftPropertyChangedHandler;
+			PropertyChangeNotifiers.Add(left);
 
 			var top = new PropertyChangeNotifier(this, Canvas.TopProperty);
 			top.ValueChanged += TopPropertyChangedHandler;
+			PropertyChangeNotifiers.Add(top);
 		}
 
 		protected Point RelativeThingCenter
@@ -81,8 +101,8 @@ namespace Coursework_2
 
 		protected void LeftPropertyChangedHandler(object sender, EventArgs e)
 		{
-			var notifier = (PropertyChangeNotifier)sender;
-			var left = (double)notifier.Value;
+			ParentCanvas.UpdateLayout();
+			var left = Canvas.GetLeft(this);
 			double linkPointX = -1;
 			for (int i = 0; i < 3; ++i)
 				linkPointX = Thing.TranslatePoint(RelativeThingCenter, ParentCanvas).X;
@@ -93,8 +113,8 @@ namespace Coursework_2
 
 		protected void TopPropertyChangedHandler(object sender, EventArgs e)
 		{
-			var notifier = (PropertyChangeNotifier)sender;
-			var top = (double)notifier.Value;
+			ParentCanvas.UpdateLayout();
+			var top = Canvas.GetTop(this);
 			double linkPointY = -1;
 			for (int i = 0; i < 3; ++i)
 				linkPointY = Thing.TranslatePoint(RelativeThingCenter, ParentCanvas).Y;

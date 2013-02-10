@@ -18,6 +18,16 @@ namespace Coursework_2
 	internal class LinkControl
 	{
 
+		protected static DependencyProperty reverseProperty;
+
+		public static DependencyProperty ReverseProperty 
+		{
+			get
+			{
+				return AutoCreateField.Get(ref reverseProperty, () => DependencyProperty.RegisterAttached( "Reverse", typeof(LinkControl), typeof(LinkControl) ));
+			}
+		}
+
 		protected Logger log = LogManager.GetCurrentClassLogger();
 
 		public LinkControl Create(Tuple<NodeControl, NodeControl> linkedNodes)
@@ -35,6 +45,7 @@ namespace Coursework_2
 		{
 			var result = new Line();
 			result.Stroke = DefaultLineBrush;
+			result.SetValue(ReverseProperty, this);
 			return result;
 		}
 
@@ -72,6 +83,7 @@ namespace Coursework_2
 			log.Debug(PropertyPathHelper.GetValue(control, path));
 			var binding = new Binding(path);
 			binding.Source = control;
+			binding.Mode = BindingMode.OneWay;
 			TheLine.SetBinding(property, binding);
 		}
 

@@ -67,19 +67,10 @@ namespace Coursework_2
 			new MouseDrop<NodeControl>().Create(Cursors.Pen, UserAddLink).Drop(Canvas);
 		}
 
-		protected Style NodeControlStyle
-		{
-			get
-			{
-				return Resources["NodeBorderStyle"] as Style;
-			}
-		}
-
 		protected void UserAddItem(Point nodePosition, Canvas canvas)
 		{
 			var nodeControl = new NodeControl();
 			canvas.Children.Add(nodeControl);
-			UpdateLayout();
 			Canvas.SetLeft(nodeControl, nodePosition.X);
 			Canvas.SetTop(nodeControl, nodePosition.Y);
 		}
