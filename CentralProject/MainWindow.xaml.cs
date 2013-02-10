@@ -9,6 +9,8 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml.Linq;
 
+using VisualInteraction = Microsoft.VisualBasic.Interaction;
+
 using NLog;
 
 using MyCSharp;
@@ -62,9 +64,15 @@ namespace Coursework_2
 			new MouseDrop<Canvas>().Create(Cursors.Pen, UserAddItem).Drop(Canvas);
 		}
 
+		protected const string NodeControlNameText = "Node name:";
+
+		protected const string NewNodeControlInputBoxTitle = "New node";
+
 		protected void UserAddItem(Point nodePosition, Canvas canvas)
 		{
 			var nodeControl = new NodeControl();
+			nodeControl.Caption.Text =
+				VisualInteraction.InputBox(NodeControlNameText, NewNodeControlInputBoxTitle, nodeControl.Caption.Text);
 			canvas.Children.Add(nodeControl);
 			Canvas.SetLeft(nodeControl, nodePosition.X);
 			Canvas.SetTop(nodeControl, nodePosition.Y);
@@ -72,15 +80,35 @@ namespace Coursework_2
 
 		protected void UserAddLink(object sender, ExecutedRoutedEventArgs args)
 		{
-			new MouseDrop<NodeControl>().Create(Cursors.Pen, UserAddLink).Drop(Canvas);
+			new MouseDrop<NodeControl>().Create(Cursors.Pen, AddLink).Drop(Canvas);
 		}
 
-		protected void UserAddLink(Point linkPosition, NodeControl control)
+		protected void AddLink(Point linkPosition, NodeControl nodeControl)
 		{
-			log.Debug("Now adding user link, first link point is: " + control.LinkPoint);
-			var linkControl = new LinkControl().Create(new Tuple<NodeControl, NodeControl>(control, null));
+			log.Debug("Now adding user link, first link control is: " + nodeControl.Caption.Text);
+			var linkControl = new LinkControl().Create();
+			linkControl.BindPoint1(nodeControl);
 			linkControl.BindPoint2MouseMove(Canvas);
 			Canvas.Children.Add(linkControl.TheLine);
+			Canvas.SetZIndex(linkControl.TheLine, -1);
+			new MouseDrop<NodeControl>().Create(Cursors.Pen,
+				(Point linkPosition2, NodeControl nodeControl2) => 
+					AddLinkFinal(linkControl, new Tuple<NodeControl, NodeControl>(nodeControl, nodeControl2)),
+				() => AddLinkCancel(linkControl)
+			).Drop(Canvas);
+		}
+
+		protected void AddLinkCancel(LinkControl link)
+		{
+			log.Debug("Now aborting user link...");
+			link.Remove();		
+		}
+
+		protected void AddLinkFinal(LinkControl link, Tuple<NodeControl, NodeControl> nodes)
+		{
+			log.Debug("Now linking: '{0}' & '{1}'", nodes.Item1.Caption.Text, nodes.Item2.Caption.Text);
+			link.BindPoint2(nodes.Item2);
+			link.LinkedNodes = new Tuple<NodeControl, NodeControl>(nodes.Item1, nodes.Item2);
 		}
 
 		protected string documentFileName;

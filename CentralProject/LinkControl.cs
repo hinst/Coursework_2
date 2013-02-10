@@ -15,7 +15,7 @@ using MyWPF;
 namespace Coursework_2
 {
 
-	internal class LinkControl
+	public class LinkControl
 	{
 
 		protected static DependencyProperty reverseProperty;
@@ -30,14 +30,9 @@ namespace Coursework_2
 
 		protected Logger log = LogManager.GetCurrentClassLogger();
 
-		public LinkControl Create(Tuple<NodeControl, NodeControl> linkedNodes)
+		public LinkControl Create()
 		{
 			theLine = CreateLine();
-			this.linkedNodes = linkedNodes;
-			if (linkedNodes.Item1 != null)
-				BindPoint1(linkedNodes.Item1);
-			if (linkedNodes.Item2 != null)
-				BindPoint2(linkedNodes.Item2);
 			return this;
 		}
 
@@ -46,14 +41,33 @@ namespace Coursework_2
 			var result = new Line();
 			result.Stroke = DefaultLineBrush;
 			result.SetValue(ReverseProperty, this);
+			result.IsHitTestVisible = false;
 			return result;
 		}
 
-		protected Brush DefaultLineBrush
+		public void DetachLineProperty()
+		{
+			TheLine.SetValue(ReverseProperty, null);
+		}
+
+		protected static Brush defaultLineBrush;
+
+		protected static Brush CreateDefaultLineBrush()
+		{
+			var color = new Color();
+			color.A = byte.MaxValue / 3 * 2;
+			color.R = 0;
+			color.G = 0;
+			color.B = 0;
+			var result = new SolidColorBrush(color);
+			return result;
+		}
+
+		protected static Brush DefaultLineBrush
 		{
 			get
 			{
-				return Brushes.Black;
+				return AutoCreateField.Get(ref defaultLineBrush, () => CreateDefaultLineBrush());
 			}
 		}
 
@@ -64,6 +78,10 @@ namespace Coursework_2
 			get
 			{
 				return linkedNodes;
+			}
+			set
+			{
+				linkedNodes = value;
 			}
 		}
 
@@ -79,8 +97,6 @@ namespace Coursework_2
 
 		protected void BindCoordinate(DependencyProperty property, string path, NodeControl control)
 		{
-			log.Debug("" + property + "," + path + "," + control);
-			log.Debug(PropertyPathHelper.GetValue(control, path));
 			var binding = new Binding(path);
 			binding.Source = control;
 			binding.Mode = BindingMode.OneWay;
@@ -96,7 +112,6 @@ namespace Coursework_2
 		public void BindPoint1(NodeControl control)
 		{
 			BindPoint(Line.X1Property, Line.Y1Property, control);
-			log.Debug(MethodBase.GetCurrentMethod() + "\n" + TheLine.X1 + "," + TheLine.Y1);
 		}
 
 		public void BindPoint2(NodeControl control)
@@ -125,6 +140,22 @@ namespace Coursework_2
 					canvas.PreviewMouseDown -= cancel;
 				};
 			canvas.PreviewMouseDown += cancel;
+		}
+
+		public Canvas ParentCanvas
+		{
+			get
+			{
+				return TheLine.NavigateUp<Canvas>();
+			}
+		}
+
+		public void Remove()
+		{
+			DetachLineProperty();
+			var parentCanvas = ParentCanvas;
+			if (parentCanvas != null)
+				ParentCanvas.Children.Remove(TheLine);
 		}
 
 	}
