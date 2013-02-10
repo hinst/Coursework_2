@@ -62,11 +62,6 @@ namespace Coursework_2
 			new MouseDrop<Canvas>().Create(Cursors.Pen, UserAddItem).Drop(Canvas);
 		}
 
-		protected void UserAddLink(object sender, ExecutedRoutedEventArgs args)
-		{
-			new MouseDrop<NodeControl>().Create(Cursors.Pen, UserAddLink).Drop(Canvas);
-		}
-
 		protected void UserAddItem(Point nodePosition, Canvas canvas)
 		{
 			var nodeControl = new NodeControl();
@@ -75,29 +70,17 @@ namespace Coursework_2
 			Canvas.SetTop(nodeControl, nodePosition.Y);
 		}
 
+		protected void UserAddLink(object sender, ExecutedRoutedEventArgs args)
+		{
+			new MouseDrop<NodeControl>().Create(Cursors.Pen, UserAddLink).Drop(Canvas);
+		}
+
 		protected void UserAddLink(Point linkPosition, NodeControl control)
 		{
 			log.Debug("Now adding user link, first link point is: " + control.LinkPoint);
 			var linkControl = new LinkControl().Create(new Tuple<NodeControl, NodeControl>(control, null));
 			linkControl.BindPoint2MouseMove(Canvas);
 			Canvas.Children.Add(linkControl.TheLine);
-		}
-
-		protected void TestAddShape()
-		{
-			var rectangle = CreateTestingShape();
-			Canvas.Children.Add(rectangle);
-			Canvas.SetLeft(rectangle, 100);
-			Canvas.SetTop(rectangle, 100);
-		}
-
-		protected Shape CreateTestingShape()
-		{
-			var result = new Rectangle();
-			result.Width = 60;
-			result.Height = 60;
-			result.Fill = Brushes.Black;
-			return result;
 		}
 
 		protected string documentFileName;
