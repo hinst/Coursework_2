@@ -117,17 +117,17 @@ namespace Coursework_2
 		{
 			BindNode(Line.X1Property, Line.Y1Property, control);
 			LinkedNodes = new Tuple<NodeControl, NodeControl>(control, LinkedNodes.Item2);
-			EnsureNodesHasRemoveLinkContextMenu();
+			EnsureNodesHaveRemoveLinkContextMenu();
 		}
 
 		public void BindNode2(NodeControl control)
 		{
 			BindNode(Line.X2Property, Line.Y2Property, control);
 			LinkedNodes = new Tuple<NodeControl, NodeControl>(LinkedNodes.Item1, control);
-			EnsureNodesHasRemoveLinkContextMenu();
+			EnsureNodesHaveRemoveLinkContextMenu();
 		}
 
-		public void EnsureNodesHasRemoveLinkContextMenu()
+		public void EnsureNodesHaveRemoveLinkContextMenu()
 		{
 			if (LinkedNodes.Item1 != null && LinkedNodes.Item2 != null)
 			{

@@ -11,6 +11,8 @@ using System.Xml.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
+using VisualInteraction = Microsoft.VisualBasic.Interaction;
+
 using NLog;
 
 using MyCSharp;
@@ -224,9 +226,34 @@ namespace Coursework_2
 		protected ContextMenu CreateContextMenu()
 		{
 			var menu = new ContextMenu();
+			menu.Items.Add(CreateRenameMenuItem());
 			menu.Items.Add(CreateRemoveMenuItem());
-			MenuItem item = new MenuItem();
 			return menu;
+		}
+
+		protected MenuItem CreateRenameMenuItem()
+		{
+			var item = new MenuItem();
+			item.Header = "Rename item";
+			item.Click +=
+				delegate(object sender, RoutedEventArgs args)
+				{
+					UserRename();
+				};
+			return item;
+		}
+
+		protected const string NodeControlNameText = "Rename node: ";
+
+		protected const string NewNodeControlInputBoxTitle = "New node";
+
+		public void UserRename()
+		{
+			var newCaptionText = 
+				VisualInteraction.InputBox(NodeControlNameText + Caption.Text, NewNodeControlInputBoxTitle, Caption.Text);
+			if (newCaptionText != null)
+				if (newCaptionText.Length > 0)
+					Caption.Text = newCaptionText;
 		}
 
 		protected MenuItem CreateRemoveMenuItem()
@@ -236,14 +263,9 @@ namespace Coursework_2
 			item.Click +=
 				delegate(object sender, RoutedEventArgs agrs)
 				{
-					RemoveMe(this);
+					Remove();
 				};
 			return item;
-		}
-
-		protected void RemoveMe(NodeControl me)
-		{
-			Remove();
 		}
 
 		protected MenuItem CreateRemoveLinkMenuItem(LinkControl link)

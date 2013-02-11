@@ -63,15 +63,10 @@ namespace Coursework_2
 			new MouseDrop<Canvas>().Create(Cursors.Pen, UserAddItem).Drop(Canvas);
 		}
 
-		protected const string NodeControlNameText = "Node name:";
-
-		protected const string NewNodeControlInputBoxTitle = "New node";
-
 		protected void UserAddItem(Point nodePosition, Canvas canvas)
 		{
 			var nodeControl = new NodeControl();
-			nodeControl.Caption.Text =
-				VisualInteraction.InputBox(NodeControlNameText, NewNodeControlInputBoxTitle, nodeControl.Caption.Text);
+			nodeControl.UserRename();
 			canvas.Children.Add(nodeControl);
 			Canvas.SetLeft(nodeControl, nodePosition.X);
 			Canvas.SetTop(nodeControl, nodePosition.Y);
@@ -158,8 +153,8 @@ namespace Coursework_2
 
 		protected void UserOpenFile(object sender, ExecutedRoutedEventArgs args)
 		{
-			log.Debug("[user_command incoming] Open file...");
 			var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+			DocumentFileName = null;
 			openFileDialog.DefaultExt = ContentFileExtension;
 			var result = openFileDialog.ShowDialog();
 			if (result == true)

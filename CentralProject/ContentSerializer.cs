@@ -78,7 +78,7 @@ namespace Coursework_2
 				id = objectIdGenerator.GetId(control, out firstTime);
 				control.SetValue(IdProperty, id);
 			}
-			return (int)id;
+			return (long)id;
 		}
 
 		protected void WriteNode(XElement elements, NodeControl node)
@@ -145,7 +145,6 @@ namespace Coursework_2
 
 		protected void ReadNodes(XElement contentElement)
 		{
-			log.Debug(MethodBase.GetCurrentMethod());
 			foreach (XNode node in contentElement.Nodes())
 			{
 				var currentElement = node as XElement;
@@ -164,7 +163,6 @@ namespace Coursework_2
 
 		protected void ReadLinks(XElement links)
 		{
-			log.Debug(MethodBase.GetCurrentMethod());
 			foreach (XNode node in links.Nodes())
 			{
 				var element = node as XElement;
@@ -176,7 +174,6 @@ namespace Coursework_2
 
 		protected void ReadLink(XElement element)
 		{
-			log.Debug("Now reading link...");
 			var link = new LinkControl().Create(element, TheCanvas);
 			link.SetValue(IdProperty, element.GetIdAttribute());
 			TheCanvas.Children.Add(link.TheLine);
