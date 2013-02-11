@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.ComponentModel;
 using System.Windows.Input;
-using System.Windows.Controls;
+using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Xml.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 using NLog;
 
@@ -41,7 +45,7 @@ namespace Coursework_2
 		{
 			get
 			{
-				return (double) this.GetValue(LinkPointXProperty);
+				return (double)this.GetValue(LinkPointXProperty);
 			}
 		}
 
@@ -49,7 +53,7 @@ namespace Coursework_2
 		{
 			get
 			{
-				return (double) this.GetValue(LinkPointYProperty);
+				return (double)this.GetValue(LinkPointYProperty);
 			}
 		}
 
@@ -92,28 +96,34 @@ namespace Coursework_2
 
 		protected bool LogDebugLinkPointPropertyChangedHandler { get { return false; } }
 
-		protected void LeftPropertyChangedHandler(object sender, EventArgs e)
+		public void UpdateLinkPointProperty()
 		{
-			ParentCanvas.UpdateLayout();
-			var left = Canvas.GetLeft(this);
-			double linkPointX = -1;
-			for (int i = 0; i < 3; ++i)
-				linkPointX = Thing.TranslatePoint(RelativeThingCenter, ParentCanvas).X;
-			SetValue(LinkPointXProperty, linkPointX);
-			if (LogDebugLinkPointPropertyChangedHandler)
-				log.Debug("LinPointXProperty assigned to: " + linkPointX + "; left is: " + left + "; rtc is: " + RelativeThingCenter);
+			UpdateLinkPointProperty( new UpdateLinkPointCoordinate[] { UpdateLinkPointCoordinate.X, UpdateLinkPointCoordinate.Y } );
+
 		}
 
 		protected void TopPropertyChangedHandler(object sender, EventArgs e)
 		{
-			ParentCanvas.UpdateLayout();
-			var top = Canvas.GetTop(this);
-			double linkPointY = -1;
-			for (int i = 0; i < 3; ++i)
-				linkPointY = Thing.TranslatePoint(RelativeThingCenter, ParentCanvas).Y;
-			SetValue(LinkPointYProperty, linkPointY);
-			if (LogDebugLinkPointPropertyChangedHandler)
-				log.Debug("LinPointYProperty assigned to: " + linkPointY + "; top is: " + top + "; rtc is: " + RelativeThingCenter);
+			UpdateLinkPointProperty(new UpdateLinkPointCoordinate[] { UpdateLinkPointCoordinate.Y });
+		}
+
+		protected void LeftPropertyChangedHandler(object sender, EventArgs e)
+		{
+			UpdateLinkPointProperty(new UpdateLinkPointCoordinate[] { UpdateLinkPointCoordinate.X });
+		}
+
+		protected enum UpdateLinkPointCoordinate { X, Y }
+
+		protected void UpdateLinkPointProperty(UpdateLinkPointCoordinate[] coordinates)
+		{
+			if (coordinates.Length == 0)
+				return;
+			UpdateLayout();
+			var linkPoint = Thing.TranslatePoint(RelativeThingCenter, ParentCanvas);
+			if (coordinates.Contains(UpdateLinkPointCoordinate.X))
+				SetValue(LinkPointXProperty, linkPoint.X);
+			if (coordinates.Contains(UpdateLinkPointCoordinate.Y))
+				SetValue(LinkPointYProperty, linkPoint.Y);
 		}
 
 		protected void InitializeContent(string text)
@@ -233,19 +243,20 @@ namespace Coursework_2
 
 		protected void RemoveMe(NodeControl me)
 		{
-			ParentCanvas.Children.Remove(me);
+			Remove();
 		}
 
 		protected MenuItem CreateRemoveLinkMenuItem(LinkControl link)
 		{
-			var opposite = link.LinkedNodes.Item1 == this ? link.LinkedNodes.Item1 : link.LinkedNodes.Item2;
+			var opposite = link.LinkedNodes.Item1 != this ? link.LinkedNodes.Item1 : link.LinkedNodes.Item2;
 			var item = new RemoveLinkMenuItem().Create(link, opposite);
 			return item;
 		}
 
-		protected void AddRemoveLinkContextMenuItem(LinkControl link)
+		public void AddRemoveLinkContextMenuItem(LinkControl link)
 		{
-			ContextMenu.Items.Add(CreateRemoveLinkMenuItem(link));
+			Assert.Assigned(Panel.ContextMenu);
+			Panel.ContextMenu.Items.Add(CreateRemoveLinkMenuItem(link));
 		}
 
 		protected Image CreateThing()
@@ -349,6 +360,47 @@ namespace Coursework_2
 			Caption.Text = element.Attribute(TextAttributeName).Value;
 			Canvas.SetLeft(this, double.Parse(element.Attribute(LeftAttributeName).Value));
 			Canvas.SetTop(this, double.Parse(element.Attribute(TopAttributeName).Value));
+		}
+
+		public static NodeControl FindBySerialId(long id, Canvas canvas)
+		{
+			var nodes =
+				from childItem
+				in canvas.Children.OfType<NodeControl>()
+				where childItem.GetValue(ContentSerializer.IdProperty).Equals(id)
+				select childItem;
+			return nodes.First();
+		}
+
+		protected void RemoveAssociatedLinks()
+		{
+			log.Debug(MethodBase.GetCurrentMethod());
+			var parentCanvas = ParentCanvas;
+			log.Debug(parentCanvas != null);
+			if (parentCanvas != null)
+			{
+				var lines = parentCanvas.Children.OfType<Line>();
+				var links = lines.Select((line) => line.GetValue(LinkControl.LinkControlProperty) as LinkControl);
+				var associatedLinks =
+					from link
+					in links
+					where link.LinkedNodes.Item1 == this || link.LinkedNodes.Item2 == this
+					select link;
+				log.Debug(associatedLinks.Count());
+				foreach (LinkControl link in associatedLinks.ToArray())
+					link.Remove();
+			}
+		}
+
+		public void Remove()
+		{
+			log.Debug(MethodBase.GetCurrentMethod());
+			var parentCanvas = ParentCanvas;
+			if (parentCanvas != null)
+			{
+				RemoveAssociatedLinks();
+				parentCanvas.Children.Remove(this);
+			}
 		}
 
 	}

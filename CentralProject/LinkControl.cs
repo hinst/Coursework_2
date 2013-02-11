@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Reflection;
+using System.Xml.Linq;
 
 using NLog;
 
@@ -15,16 +16,16 @@ using MyWPF;
 namespace Coursework_2
 {
 
-	public class LinkControl
+	public class LinkControl : DependencyObject
 	{
 
 		protected static DependencyProperty reverseProperty;
 
-		public static DependencyProperty ReverseProperty 
+		public static DependencyProperty LinkControlProperty 
 		{
 			get
 			{
-				return AutoCreateField.Get(ref reverseProperty, () => DependencyProperty.RegisterAttached( "Reverse", typeof(LinkControl), typeof(LinkControl) ));
+				return AutoCreateField.Get(ref reverseProperty, () => DependencyProperty.RegisterAttached( "LinkControl", typeof(LinkControl), typeof(LinkControl) ));
 			}
 		}
 
@@ -40,14 +41,14 @@ namespace Coursework_2
 		{
 			var result = new Line();
 			result.Stroke = DefaultLineBrush;
-			result.SetValue(ReverseProperty, this);
+			result.SetValue(LinkControlProperty, this);
 			result.IsHitTestVisible = false;
 			return result;
 		}
 
 		public void DetachLineProperty()
 		{
-			TheLine.SetValue(ReverseProperty, null);
+			TheLine.SetValue(LinkControlProperty, null);
 		}
 
 		protected static Brush defaultLineBrush;
@@ -77,13 +78,15 @@ namespace Coursework_2
 		{
 			get
 			{
-				return linkedNodes;
+				return AutoCreateField.Get(ref linkedNodes, () => new Tuple<NodeControl, NodeControl>(null, null));
 			}
 			set
 			{
 				linkedNodes = value;
 			}
 		}
+
+		public event Action RemoveAssociatedElements;
 
 		protected Line theLine;
 
@@ -103,20 +106,34 @@ namespace Coursework_2
 			TheLine.SetBinding(property, binding);
 		}
 
-		protected void BindPoint(DependencyProperty xProperty, DependencyProperty yProperty, NodeControl control)
+		protected void BindNode(DependencyProperty xProperty, DependencyProperty yProperty, NodeControl control)
 		{
+			control.UpdateLinkPointProperty();
 			BindCoordinate(xProperty, "LinkPointX", control);
 			BindCoordinate(yProperty, "LinkPointY", control);
 		}
 
-		public void BindPoint1(NodeControl control)
+		public void BindNode1(NodeControl control)
 		{
-			BindPoint(Line.X1Property, Line.Y1Property, control);
+			BindNode(Line.X1Property, Line.Y1Property, control);
+			LinkedNodes = new Tuple<NodeControl, NodeControl>(control, LinkedNodes.Item2);
+			EnsureNodesHasRemoveLinkContextMenu();
 		}
 
-		public void BindPoint2(NodeControl control)
+		public void BindNode2(NodeControl control)
 		{
-			BindPoint(Line.X2Property, Line.Y2Property, control);
+			BindNode(Line.X2Property, Line.Y2Property, control);
+			LinkedNodes = new Tuple<NodeControl, NodeControl>(LinkedNodes.Item1, control);
+			EnsureNodesHasRemoveLinkContextMenu();
+		}
+
+		public void EnsureNodesHasRemoveLinkContextMenu()
+		{
+			if (LinkedNodes.Item1 != null && LinkedNodes.Item2 != null)
+			{
+				LinkedNodes.Item1.AddRemoveLinkContextMenuItem(this);
+				LinkedNodes.Item2.AddRemoveLinkContextMenuItem(this);
+			}
 		}
 
 		/// <summary>
@@ -152,11 +169,39 @@ namespace Coursework_2
 
 		public void Remove()
 		{
+			RemoveAssociatedElements();
 			DetachLineProperty();
 			var parentCanvas = ParentCanvas;
 			if (parentCanvas != null)
 				ParentCanvas.Children.Remove(TheLine);
 		}
+
+		#region serialization
+
+		protected const string XmlNode1AttributeName = "Node1";
+		protected const string XmlNode2AttributeName = "Node2";
+
+		public XElement SaveToElement()
+		{
+			var result = new XElement(GetType().Name);
+			result.SetAttributeValue(XmlNode1AttributeName, LinkedNodes.Item1.GetValue(ContentSerializer.IdProperty));
+			result.SetAttributeValue(XmlNode2AttributeName, LinkedNodes.Item2.GetValue(ContentSerializer.IdProperty));
+			return result;
+		}
+
+		public LinkControl Create(XElement element, Canvas canvas)
+		{
+			var node1_ID = int.Parse(element.Attribute(XmlNode1AttributeName).Value);
+			var node2_ID = int.Parse(element.Attribute(XmlNode2AttributeName).Value);
+			Create();
+			var node1 = NodeControl.FindBySerialId(node1_ID, canvas);
+			var node2 = NodeControl.FindBySerialId(node2_ID, canvas);
+			BindNode1(node1);
+			BindNode2(node2);
+			return this;
+		}
+
+		#endregion
 
 	}
 

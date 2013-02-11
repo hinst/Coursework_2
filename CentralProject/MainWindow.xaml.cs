@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Windows.Shapes;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Xml.Linq;
 
 using VisualInteraction = Microsoft.VisualBasic.Interaction;
 
@@ -87,7 +86,7 @@ namespace Coursework_2
 		{
 			log.Debug("Now adding user link, first link control is: " + nodeControl.Caption.Text);
 			var linkControl = new LinkControl().Create();
-			linkControl.BindPoint1(nodeControl);
+			linkControl.BindNode1(nodeControl);
 			linkControl.BindPoint2MouseMove(Canvas);
 			Canvas.Children.Add(linkControl.TheLine);
 			Canvas.SetZIndex(linkControl.TheLine, -1);
@@ -107,8 +106,7 @@ namespace Coursework_2
 		protected void AddLinkFinal(LinkControl link, Tuple<NodeControl, NodeControl> nodes)
 		{
 			log.Debug("Now linking: '{0}' & '{1}'", nodes.Item1.Caption.Text, nodes.Item2.Caption.Text);
-			link.BindPoint2(nodes.Item2);
-			link.LinkedNodes = new Tuple<NodeControl, NodeControl>(nodes.Item1, nodes.Item2);
+			link.BindNode2(nodes.Item2);
 		}
 
 		protected string documentFileName;
@@ -124,8 +122,6 @@ namespace Coursework_2
 				documentFileName = value;
 			}
 		}
-
-		#region Save content
 
 		protected void UserSaveFile(object sender, ExecutedRoutedEventArgs args)
 		{
@@ -150,53 +146,15 @@ namespace Coursework_2
 
 		protected void UserSaveFile(string fileName)
 		{
-			log.Debug("Now saving '" + fileName + "'...");
-			ContentToXml().Save(fileName);
+			new ContentSerializer().Create(Canvas).SaveToFile(fileName);
 		}
-
-		protected XDocument ContentToXml()
-		{
-			var result = new XDocument();
-			result.Add(ContentToElement());
-			return result;
-		}
-
-		protected XElement ContentToElement()
-		{
-			var element = new XElement(XmlContentElementName);
-			WriteNodes(element);
-			return element;
-		}
-
-		protected void WriteNodes(XElement element)
-		{
-			Assert.Assigned(element);
-			Assert.Assigned(Canvas); // nodes are being searched on the Canvas
-			ForEach.MatchingType<NodeControl>(
-				Canvas.Children,
-				(control) =>
-					element.Add(control.SaveToElement())
-			);
-		}
-
-		protected void ContentFromElement(XElement element)
-		{
-			Assert.Assigned(element);
-			LoadNodes(element);
-		}
-
-		#endregion Save content
 
 		protected const string ContentFileExtension = ".xml";
-
-		public const string XmlContentElementName = "content";
 
 		protected void ClearContent()
 		{
 			Canvas.Children.Clear();
 		}
-
-		#region Load content
 
 		protected void UserOpenFile(object sender, ExecutedRoutedEventArgs args)
 		{
@@ -214,43 +172,16 @@ namespace Coursework_2
 		protected void UserOpenFileSafe(string fileName)
 		{
 			if (File.Exists(fileName))
-				UserOpenFile(fileName);
+				UserLoadFile(fileName);
 			else
 				MessageBox.Show(this, fileName, "File does not exist", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 
-		protected void UserOpenFile(string fileName)
-		{
-			var document = XDocument.Load(fileName);
-			LoadContentFrom(document);
-		}
-
-		protected void LoadContentFrom(XDocument document)
+		protected void UserLoadFile(string fileName)
 		{
 			ClearContent();
-			var contentElement = document.Element(XmlContentElementName);
-			Assert.Assigned(contentElement);
-			LoadNodes(contentElement);
+			new ContentSerializer().Create(Canvas).LoadFromFile(fileName);
 		}
-
-		protected void LoadNodes(XElement contentElement)
-		{
-			foreach (XNode node in contentElement.Nodes())
-			{
-				var currentElement = node as XElement;
-				if (currentElement != null)
-					if (currentElement.Name == typeof(NodeControl).Name)
-						LoadNodeControl(currentElement);
-			}
-		}
-
-		protected void LoadNodeControl(XElement nodeElement)
-		{
-			var visualNode = NodeControl.Create(nodeElement);
-			Canvas.Children.Add(visualNode);
-		}
-
-		#endregion
 
 	}
 
