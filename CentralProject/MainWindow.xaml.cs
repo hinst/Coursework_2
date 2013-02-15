@@ -66,10 +66,12 @@ namespace Coursework_2
 		protected void UserAddItem(Point nodePosition, Canvas canvas)
 		{
 			var nodeControl = new NodeControl();
-			nodeControl.UserRename();
-			canvas.Children.Add(nodeControl);
-			Canvas.SetLeft(nodeControl, nodePosition.X);
-			Canvas.SetTop(nodeControl, nodePosition.Y);
+			if (nodeControl.UserRename(this))
+			{
+				canvas.Children.Add(nodeControl);
+				Canvas.SetLeft(nodeControl, nodePosition.X);
+				Canvas.SetTop(nodeControl, nodePosition.Y);
+			}
 		}
 
 		protected void UserAddLink(object sender, ExecutedRoutedEventArgs args)
@@ -84,7 +86,6 @@ namespace Coursework_2
 			linkControl.BindNode1(nodeControl);
 			linkControl.BindPoint2MouseMove(Canvas);
 			Canvas.Children.Add(linkControl.TheLine);
-			Canvas.SetZIndex(linkControl.TheLine, -1);
 			new MouseDrop<NodeControl>().Create(Cursors.Pen,
 				(Point linkPosition2, NodeControl nodeControl2) => 
 					AddLinkFinal(linkControl, new Tuple<NodeControl, NodeControl>(nodeControl, nodeControl2)),

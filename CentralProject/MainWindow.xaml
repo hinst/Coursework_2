@@ -10,7 +10,7 @@
 			<Setter Property="BorderThickness" Value="1.5" />
 			<Setter Property="BorderBrush" Value="DarkGray" />
 		</Style>
-		<Image x:Key="Image_File" Source="Images/DocumentBlack16.png" Width="16px" Height="16px" SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="HighQuality" />
+		<Image x:Key="Image_File" Source="Images/DocumentBlack16.png" Width="16px" Height="16px"  RenderOptions.BitmapScalingMode="HighQuality" />
 		<Image x:Key="Image_OpenFile" Source="Images/OpenFileBlack16.png" />
 		<Image x:Key="Image_SaveFile" Source="Images/SaveFileBlack16.png" />
 		<Image x:Key="Image_SaveAsFile" Source="Images/SaveAsFileBlack16.png" />
@@ -18,7 +18,7 @@
 		<Image x:Key="Image_DrawLink" Source="Images/LinkBlack16.png" />
 	</Window.Resources>
 	<DockPanel>
-		<Menu DockPanel.Dock="Top" UseLayoutRounding="True">
+		<Menu DockPanel.Dock="Top" UseLayoutRounding="True" SnapsToDevicePixels="True">
 			<MenuItem Header="File" Icon="{StaticResource Image_File}">
 				<MenuItem Header="Open file..." x:Name="OpenFileMenuItem" Icon="{StaticResource Image_OpenFile}" />
 				<MenuItem Header="Save file" x:Name="SaveFileMenuItem" Icon="{StaticResource Image_SaveFile}" />

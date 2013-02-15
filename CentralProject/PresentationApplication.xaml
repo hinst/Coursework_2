@@ -4,6 +4,11 @@
 	StartupUri="MainWindow.xaml"
 >
 	<Application.Resources>
-		<Image x:Key="Image_NodeShape" Source="Images/BulletShapeBlack16.png" x:Shared="False" />
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<!--<ResourceDictionary Source="Themes/BubbleCreme.xaml"/>-->
+			</ResourceDictionary.MergedDictionaries>
+			<Image x:Key="Image_NodeShape" Source="Images/BulletShapeBlack16.png" x:Shared="False" />
+		</ResourceDictionary>
 	</Application.Resources>
 </Application>

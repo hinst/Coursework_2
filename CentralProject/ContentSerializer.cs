@@ -58,6 +58,18 @@ namespace Coursework_2
 			return element;
 		}
 
+		protected void GenerateIds()
+		{
+			ForEach.MatchingType<DependencyObject>(
+				TheCanvas.Children,
+				(element) => 
+				{
+					element.SetValue(IdProperty, GetNewId(element));
+					Console.WriteLine(GetExistingId(element));
+				}
+			);
+		}
+
 		#region nodes
 
 		protected void WriteNodes(XElement element)
@@ -69,22 +81,24 @@ namespace Coursework_2
 			);
 		}
 
-		protected long GetId(DependencyObject control)
+		protected long GetNewId(DependencyObject control)
 		{
-			var id = control.GetValue(IdProperty);
-			if (id == null)
-			{
-				bool firstTime;
-				id = objectIdGenerator.GetId(control, out firstTime);
-				control.SetValue(IdProperty, id);
-			}
+			bool firstTime;
+			var id = objectIdGenerator.GetId(control, out firstTime);
 			return (long)id;
+		}
+
+		protected long GetExistingId(DependencyObject control)
+		{
+			var id = (long)control.GetValue(IdProperty);
+			return id;
 		}
 
 		protected void WriteNode(XElement elements, NodeControl node)
 		{
 			var element = node.SaveToElement();
-			element.SetIdAttribute(GetId(node));
+			node.SetValue(IdProperty, GetNewId(node));
+			element.SetIdAttribute(GetExistingId(node));
 			elements.Add(element);
 		}
 
@@ -111,7 +125,8 @@ namespace Coursework_2
 		{
 			Assert.Assigned(link);
 			var element = link.SaveToElement();
-			element.SetIdAttribute(GetId(link));
+			link.SetValue(IdProperty, GetNewId(link));
+			element.SetIdAttribute(GetExistingId(link));
 			elements.Add(element);
 		}
 

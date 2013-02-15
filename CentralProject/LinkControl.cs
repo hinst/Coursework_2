@@ -43,6 +43,7 @@ namespace Coursework_2
 			result.Stroke = DefaultLineBrush;
 			result.SetValue(LinkControlProperty, this);
 			result.IsHitTestVisible = false;
+			Canvas.SetZIndex(result, -1);
 			return result;
 		}
 

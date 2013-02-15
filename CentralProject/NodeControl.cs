@@ -207,6 +207,8 @@ namespace Coursework_2
 			caption.Text = text;
 		}
 
+		protected static readonly Thickness DefaultMargin = new Thickness(3);
+
 		protected StackPanel CreatePanel(string text)
 		{
 			var result = new StackPanel();
@@ -217,7 +219,7 @@ namespace Coursework_2
 			result.Children.Add(caption);
 			ForEach.MatchingType<FrameworkElement>(
 				result.Children,
-				element => element.Margin = new Thickness(3)
+				element => element.Margin = DefaultMargin
 			);
 			result.ContextMenu = CreateContextMenu();
 			return result;
@@ -243,17 +245,17 @@ namespace Coursework_2
 			return item;
 		}
 
-		protected const string NodeControlNameText = "Rename node: ";
+		protected const string RenameDialogTitleText = "Rename node";
 
-		protected const string NewNodeControlInputBoxTitle = "New node";
+		protected const string RenameNodeInputBoxTitle = "Rename node from \"{0}\" to:";
 
-		public void UserRename()
+		public bool UserRename(Window parent = null)
 		{
-			var newCaptionText = 
-				VisualInteraction.InputBox(NodeControlNameText + Caption.Text, NewNodeControlInputBoxTitle, Caption.Text);
-			if (newCaptionText != null)
-				if (newCaptionText.Length > 0)
-					Caption.Text = newCaptionText;
+			var newCaptionText = TextEditWindow.Perform(parent ?? this.NavigateUp<Window>(), RenameDialogTitleText, string.Format(RenameNodeInputBoxTitle, Caption.Text), Caption.Text);
+			var renamed = newCaptionText != null;
+			if (renamed)
+				Caption.Text = newCaptionText;
+			return renamed;
 		}
 
 		protected MenuItem CreateRemoveMenuItem()
