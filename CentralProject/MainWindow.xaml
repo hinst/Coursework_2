@@ -29,7 +29,8 @@
 				<MenuItem Header="Add Item" x:Name="AddItemMenuItem" Icon="{StaticResource Image_NewItem}" />
 				<MenuItem Header="Add link" x:Name="AddLinkMenuItem" Icon="{StaticResource Image_DrawLink}" />
 			</MenuItem>
-			<MenuItem Header="Help"></MenuItem>
+			<MenuItem Header="Help">
+			</MenuItem>
 		</Menu>
 		<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
 			<Canvas Width="1000" Height="1000" x:Name="Canvas" Background="WhiteSmoke">
