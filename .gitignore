@@ -3,3 +3,5 @@ bin/
 *.user
 packages/
 *.suo
+~$*
+~WR*.tmp
