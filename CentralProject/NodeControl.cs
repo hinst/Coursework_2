@@ -398,9 +398,7 @@ namespace Coursework_2
 
 		protected void RemoveAssociatedLinks()
 		{
-			log.Debug(MethodBase.GetCurrentMethod());
 			var parentCanvas = ParentCanvas;
-			log.Debug(parentCanvas != null);
 			if (parentCanvas != null)
 			{
 				var lines = parentCanvas.Children.OfType<Line>();
@@ -410,7 +408,6 @@ namespace Coursework_2
 					in links
 					where link.LinkedNodes.Item1 == this || link.LinkedNodes.Item2 == this
 					select link;
-				log.Debug(associatedLinks.Count());
 				foreach (LinkControl link in associatedLinks.ToArray())
 					link.Remove();
 			}
@@ -418,7 +415,6 @@ namespace Coursework_2
 
 		public void Remove()
 		{
-			log.Debug(MethodBase.GetCurrentMethod());
 			var parentCanvas = ParentCanvas;
 			if (parentCanvas != null)
 			{
