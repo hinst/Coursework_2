@@ -63,10 +63,7 @@ namespace Coursework_2
 			ForEach.MatchingType<DependencyObject>(
 				TheCanvas.Children,
 				(element) => 
-				{
-					element.SetValue(IdProperty, GetNewId(element));
-					Console.WriteLine(GetExistingId(element));
-				}
+					element.SetValue(IdProperty, GetNewId(element))
 			);
 		}
 
