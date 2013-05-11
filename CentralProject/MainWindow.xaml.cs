@@ -7,13 +7,10 @@ using System.Reflection;
 using System.Windows.Shapes;
 using System.Windows.Controls;
 using System.Windows.Media;
-
+using System.Diagnostics;
 using VisualInteraction = Microsoft.VisualBasic.Interaction;
-
 using NLog;
-
 using MyCSharp;
-
 using MyWPF;
 
 namespace Coursework_2
@@ -47,6 +44,7 @@ namespace Coursework_2
 			BindCommand(SaveAsFileMenuItem, Commands.SaveAsFile, UserSaveAsFile);
 			BindCommand(AddItemMenuItem, Commands.AddShape, UserAddItem);
 			BindCommand(AddLinkMenuItem, Commands.DrawLink, UserAddLink);
+			BindCommand(GenerateLargeDocumentMenuItem, Commands.TestGenerateLargeDocument, TestGenerateLargeDocument);
 		}
 
 		protected void BindCommand(MenuItem item, RoutedUICommand command, ExecutedRoutedEventHandler handler)
@@ -77,6 +75,10 @@ namespace Coursework_2
 		protected void UserAddLink(object sender, ExecutedRoutedEventArgs args)
 		{
 			new MouseDrop<NodeControl>().Create(Cursors.Pen, AddLink).Drop(Canvas);
+		}
+
+		protected void TestGenerateLargeDocument(object sender, ExecutedRoutedEventArgs args)
+		{
 		}
 
 		protected void AddLink(Point linkPosition, NodeControl nodeControl)
@@ -142,13 +144,17 @@ namespace Coursework_2
 
 		protected void UserSaveFile(string fileName)
 		{
+			var stopWatch = Stopwatch.StartNew();
 			new ContentSerializer().Create(Canvas).SaveToFile(fileName);
+			stopWatch.Stop();
+			log.Debug(() => "Saving time: " + stopWatch.ElapsedMilliseconds);
 		}
 
 		protected const string ContentFileExtension = ".xml";
 
 		protected void ClearContent()
 		{
+			log.Debug("Now clearing content...");
 			Canvas.Children.Clear();
 		}
 
@@ -175,8 +181,11 @@ namespace Coursework_2
 
 		protected void UserLoadFile(string fileName)
 		{
-			ClearContent();
-			new ContentSerializer().Create(Canvas).LoadFromFile(fileName);
+			var stopWatch = Stopwatch.StartNew(); // начать отсчёт
+			ClearContent(); // очистить документ
+			new ContentSerializer().Create(Canvas).LoadFromFile(fileName); // загрузить документ
+			stopWatch.Stop(); // остановить отчёт
+			log.Debug(() => "Loading time: " + stopWatch.ElapsedMilliseconds); // вывести результат
 		}
 
 	}

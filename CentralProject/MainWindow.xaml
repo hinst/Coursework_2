@@ -3,8 +3,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:h="clr-namespace:Coursework_2"
 	Title="MainWindow"
-	x:Name="CentralProjectMainWindow"
->
+	x:Name="CentralProjectMainWindow" Height="300" Width="300">
 	<Window.Resources>
 		<Style x:Key="NodeBorderStyle" TargetType="Border">
 			<Setter Property="BorderThickness" Value="1.5" />
@@ -25,6 +24,9 @@
 				<MenuItem Header="Save as file..." x:Name="SaveAsFileMenuItem" Icon="{StaticResource Image_SaveAsFile}" />
 			</MenuItem>
 			<MenuItem Header="View"> </MenuItem>
+            <MenuItem Header="Test">
+                <MenuItem Header="Generate large document" x:Name="GenerateLargeDocumentMenuItem"></MenuItem>
+            </MenuItem>
 			<MenuItem Header="Edit">
 				<MenuItem Header="Add Item" x:Name="AddItemMenuItem" Icon="{StaticResource Image_NewItem}" />
 				<MenuItem Header="Add link" x:Name="AddLinkMenuItem" Icon="{StaticResource Image_DrawLink}" />
