@@ -26,6 +26,7 @@
 			<MenuItem Header="View"> </MenuItem>
             <MenuItem Header="Test">
                 <MenuItem Header="Generate large document" x:Name="GenerateLargeDocumentMenuItem"></MenuItem>
+                <MenuItem Header="Generate and save large document" x:Name="GenerateAndSaveLargeDocumentMenuItem"></MenuItem>
             </MenuItem>
 			<MenuItem Header="Edit">
 				<MenuItem Header="Add Item" x:Name="AddItemMenuItem" Icon="{StaticResource Image_NewItem}" />

@@ -88,6 +88,20 @@ namespace Coursework_2
 			}
 		}
 
+		protected RoutedUICommand testGenerateSaveLargeDocument;
+
+		public RoutedUICommand TestGenerateSaveLargeDocuement
+		{
+			get
+			{
+				return AutoCreateField.Get(
+						ref testGenerateSaveLargeDocument,
+						() => new RoutedUICommand("Generate and save large document", "TestGenerateSaveLargeDocument", GetType())
+					)
+				;
+			}
+		}
+
 		protected static PresentationApplicationCommands commands;
 
 		public static PresentationApplicationCommands Commands

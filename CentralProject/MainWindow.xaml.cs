@@ -44,7 +44,8 @@ namespace Coursework_2
 			BindCommand(SaveAsFileMenuItem, Commands.SaveAsFile, UserSaveAsFile);
 			BindCommand(AddItemMenuItem, Commands.AddShape, UserAddItem);
 			BindCommand(AddLinkMenuItem, Commands.DrawLink, UserAddLink);
-			BindCommand(GenerateLargeDocumentMenuItem, Commands.TestGenerateLargeDocument, TestGenerateLargeDocument);
+			BindCommand(GenerateLargeDocumentMenuItem, Commands.TestGenerateLargeDocument, UserTestGenerateLargeDocument);
+			BindCommand(GenerateAndSaveLargeDocumentMenuItem, Commands.TestGenerateSaveLargeDocuement, TestGenerateAndSaveLargeDocument);
 		}
 
 		protected void BindCommand(MenuItem item, RoutedUICommand command, ExecutedRoutedEventHandler handler)
@@ -77,8 +78,60 @@ namespace Coursework_2
 			new MouseDrop<NodeControl>().Create(Cursors.Pen, AddLink).Drop(Canvas);
 		}
 
-		protected void TestGenerateLargeDocument(object sender, ExecutedRoutedEventArgs args)
+		protected void UserTestGenerateLargeDocument(object sender, ExecutedRoutedEventArgs args)
 		{
+			var countText = TextEditWindow.Perform(this, "Generate test document", "Enter the count of nodes & links", "1000");
+			if (countText != null)
+			{
+				var count = int.Parse(countText);
+				TestGenerateLargeDocument(count, count);
+			}
+		}
+
+		protected void TestGenerateLargeDocument(int count, int countOfLinks)
+		{
+			ClearContent();
+			log.Debug(() => "Now generating document: count of nodes: " + count + "; count of links: " + countOfLinks);
+			var nodes = new List<NodeControl>(count);
+			var random = new Random();
+			for (int i = 0; i < count; ++i)
+			{
+				//log.Debug(() => "Node #" + i + "...");
+				var node = new NodeControl(i.ToString());
+				nodes.Add(node);
+				Canvas.Children.Add(node);
+				node.UpdateLayout();
+				Canvas.SetLeft(node, random.NextDouble() * (Canvas.Width - node.ActualWidth));
+				Canvas.SetTop(node, random.NextDouble() * (Canvas.Height - node.ActualHeight));
+			}
+			for (int i = 0; i < countOfLinks; ++i)
+			{
+				//log.Debug(() => "Link #" + i + "...");
+				var index1 = random.Next(count);
+				var index2 = random.Next(count);
+				if (index1 != index2)
+				{
+					var link = new LinkControl().Create();
+					var node1 = nodes[index1];
+					var node2 = nodes[index2];
+					Canvas.Children.Add(link.TheLine);
+					link.BindNode1(node1);
+					link.BindNode2(node2);
+				}
+			}
+		}
+
+		protected void TestGenerateAndSaveLargeDocument(object sender, ExecutedRoutedEventArgs args)
+		{
+			const int count = 1700;
+			var stopWatch = Stopwatch.StartNew();
+			TestGenerateLargeDocument(count, count);
+			stopWatch.Stop();
+			log.Debug(() => "Generate large document: time: " + stopWatch.ElapsedMilliseconds);
+			stopWatch.Start();
+			UserSaveFile("test.xml");
+			stopWatch.Stop();
+			log.Debug(() => "Generate & save: total time: " + stopWatch.ElapsedMilliseconds);
 		}
 
 		protected void AddLink(Point linkPosition, NodeControl nodeControl)
